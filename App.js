@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Modal, Portal, Button, Provider } from 'react-native-paper';
-import { SafeAreaView, View, Text, Image, TouchableOpacity, Keyboard, Alert, FlatList, StyleSheet, ScrollView } from 'react-native';
+import { SafeAreaView, View, Text, Image, TouchableOpacity, Keyboard, Alert, FlatList, StyleSheet, ScrollView,SectionList, StatusBar,TextInput } from 'react-native';
 import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -115,14 +115,74 @@ const HomeScreen = () => {
   );
 };
 
-const SecondScreen = () => {
-  return (
-    <SafeAreaView flex={1}>
-      <View style={styles.MainContainer}>
-        <Text style={{ fontSize: 25, color: 'black' }}>Second Screen</Text>
+const SecondScreen = ({ navigation }) => {
+  const DATA = [];
+  const data = [
+    { key: 'Desayunos' },
+    { key: 'Comidas' },
+    { key: 'Bebidas' },
+    { key: 'Postres' },
+    
+  ];
+  
+   const column1Data = data.filter((item, i) => i%2 === 0);
+    const column2Data = data.filter((item, i) => i%2 === 1);
+    const styles3 = StyleSheet.create({
+      container: {
+        flex: 2,
+        flexDirection: 'row',
+        height:'auto'
+      },
+      column: {
+        flex: 1,
+        flexDirection: 'column',
+        margin:2
+      },
+      row: {
+        flexDirection: 'row'
+      },
+      item: {
+          backgroundColor: "#C4C4C4",
+        padding: 20,
+        marginVertical: 8,
+        flex: 1,
+        borderRadius:10
+        
+      },
+      title: {
+        fontSize: 32,
+      },
+    });
+    return (
+      <>
+      <Text style={{ marginTop: 5, fontSize: 26,textAlign: 'center'  }}>Menú</Text>
+      <View style={ styles3.container }>
+  
+        <View style={ styles3.column }>
+          <FlatList
+            data={ column1Data }
+            renderItem={ ({ item }) => (
+              <View  style={ styles3.item } >
+                <Text onPress={() => navigation.navigate('menu')} style={{textAlign: 'center'  }}>{ item.key }</Text>
+              </View>
+            ) }
+          />
+        </View>
+  
+        <View style={ styles3.column }>
+          <FlatList
+            data={ column2Data }
+            renderItem={ ({ item }) => (
+              <View style={ styles3.item }>
+                <Text style={{textAlign: 'center'  }}>{ item.key }</Text>
+              </View>
+            ) }
+          />
+        </View>
+  
       </View>
-    </SafeAreaView>
-  );
+      </>
+    );
 };
 
 const ThirdScreen = () => {
@@ -154,6 +214,103 @@ const styles = StyleSheet.create({
 });
 
 
+const menuScreen=()=>{
+  const [visible, setVisible] = React.useState(false);
+  const [number, onChangeNumber] = React.useState(0);
+  const showModal = () => setVisible(true);
+  const hideModal = () => setVisible(false);
+  const containerStyle = {backgroundColor: 'white', padding: 10};
+
+  const DATA = [
+    {
+      title: "Main dishes",
+      data: ["Pizza", "Burger", "Risotto"]
+    }
+  ];
+  const Item = ({ title }) => (
+    <View style={stylesmenu.item}  >
+     <Image
+          
+          style={stylesmenu.tinyLogo}
+          source={{
+            uri: 'https://images.unsplash.com/photo-1513104890138-7c749659a591?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8M3x8fGVufDB8fHx8&w=1000&q=80',
+          }}
+        />
+      <Text style={stylesmenu.title} onPress={showModal}>{title}</Text>
+    </View>
+  );
+  return (
+    <SafeAreaView style={stylesmenu.container}>
+    <SectionList
+      sections={DATA}
+      keyExtractor={(item, index) => item + index}
+      renderItem={({ item }) => <Item title={item}  />}
+      renderSectionHeader={({ section: { title } }) => (
+        <Text style={stylesmenu.header}  >{title}</Text>
+      )}
+     
+    />
+     <Modal visible={visible} onDismiss={hideModal} contentContainerStyle={containerStyle} style={{ padding: 10 }}>
+          <Text style={{ fontSize: 18,textAlign: 'center',marginTop:20 }}>¿cuántas unidades de este  alimento desea ordenar?</Text>
+          <TextInput
+        style={stylesmenu.input}
+        onChangeText={onChangeNumber}
+        value={number}
+      />
+      <div style={{display:'flex',flexDirection:'row',justifyContent:'flex-end'}}>
+          <Button style={{backgroundColor:'red',margin: 15 }} onPress={hideModal}><Text style={{  color: 'black' }}>Ok</Text></Button>
+          <Button style={{backgroundColor:'blue',margin: 15 }} onPress={hideModal}><Text style={{  color: 'black' }}>Ok</Text></Button>
+          </div>
+        </Modal>
+  </SafeAreaView>
+  );
+} 
+const stylesmenu = StyleSheet.create({
+  container: {
+    flex: 2,
+    flexDirection: 'row',
+    height:'auto',
+paddingTop: StatusBar.currentHeight,
+marginHorizontal: 16
+},
+item: {
+flex: 2,
+flexDirection: 'row',
+backgroundColor: "#FFFFFF",
+padding: 0,
+marginVertical: 8,
+textAlign: 'center',
+borderRadius:10
+},
+header: {
+fontSize: 22,
+
+textAlign: 'center'
+},
+title: {
+fontSize: 24,
+textAlign: 'center'
+},
+  title: {
+    fontSize: 24,
+    textAlign: 'center'
+  },
+   tinyLogo: {
+    width: 100,
+    height: 90,
+    marginTop:0,
+    marginRight:50,
+    borderRadius:10
+  },
+  input: {
+    height: 40,
+    margin: 12,
+    marginTop:30,
+    marginBottom:20,
+    borderWidth: 1,
+    padding:10
+  }
+});
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
 
@@ -227,6 +384,33 @@ function ThirdStack({ navigation }) {
   );
 }
 
+
+function fourthStack({ navigation }) {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerLeft: () => (
+          <HamburgerIcon navigationProps={navigation} />
+        ),
+        headerStyle: {
+          backgroundColor: '#F36565',
+        },
+        headerTintColor: '#fff',
+      }}>
+
+      <Stack.Screen
+        name="FourthScreen"
+        component={menuScreen}
+        options={{
+          title: 'Menú',
+        }}
+      />
+
+    </Stack.Navigator>
+  );
+}
+
+
 export default function App() {
   return (
     <NavigationContainer>
@@ -261,6 +445,11 @@ export default function App() {
             iconName: require("./img/recientes.png")
           }}
           component={ThirdStack}
+        />
+        <Drawer.Screen
+           name="menu"
+           
+           component={fourthStack}
         />
 
       </Drawer.Navigator>
